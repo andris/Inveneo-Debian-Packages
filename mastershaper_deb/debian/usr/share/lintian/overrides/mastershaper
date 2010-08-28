@@ -1,0 +1,14 @@
+#We know it's not policy to put stuff into /var/www
+#but we're going to do it anyway
+mastershaper binary: dir-or-file-in-var-www
+
+#We know we're embedding php libraries.  We're going to do it anyway
+mastershaper binary: embedded-php-library
+mastershaper binary: extra-license-file
+
+#We know there's a non standard permission on the config.dat file
+mastershaper binary: non-standard-file-perm var/www/mastershaper/config.dat 0600 != 0644
+
+#We know there's a config file in var/www.  Debian doesn't like this, but that's
+#how mastershaper rolls
+mastershaper binary: non-etc-file-marked-as-conffile /var/www/mastershaper/config.dat

@@ -1,0 +1,16 @@
+Template: mastershaper/configure_sudoers
+Type: boolean
+Default: true
+Description: A line must be added to your /etc/sudoers file.  Do this automatically?
+ To allow a user to enable and disable the mastershaper rules from the web UI, the www-data user must be able to execute the shell command required to do so.  
+ To enable this, the following line must be added to /etc/sudoers: 
+ "www-data      ALL= NOPASSWD: /var/www/mastershaper/shaper_loader.sh"  
+ If you choose to make this change manually,  you will also have to remove the line manually if you choose to remove mastershaper.
+
+Template: mastershaper/use_inveneo_config
+Type: boolean
+Default: true
+Description: Configure mastershaper with Inveneo's default options?
+ Inveneo (www.inveneo.org) has selected a set of default mastershaper configuration options for use with its
+ Inveneo Hub Server (IHL).  If you are configuring Mastershaper for use with an IHL server, choose yse.
+ If you are installing on an alternate hardware platform, this may work for you, but use at your own risk.

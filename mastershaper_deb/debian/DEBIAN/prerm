@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# stop if we hit an error
+set -e
+
+# Include debconf and dbconfig-common for configuration
+# source debconf stuff
+. /usr/share/debconf/confmodule
+# source dbconfig-common stuff
+. /usr/share/dbconfig-common/dpkg/prerm.mysql
+dbc_go mastershaper $@
+
+# Stop mastershaper
+if [ -f /etc/init.d/mastershaper ]; then
+  invoke-rc.d mastershaper stop
+fi
+
+#purge mastershaper config file
+if [ "$1" = "purge" -a -e /var/www/mastershaper/config.dat ]; then
+    # This is created after install time and must be removed manually
+    rm -f /var/www/mastershaper/config.dat
+fi

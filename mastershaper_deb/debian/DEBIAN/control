@@ -1,0 +1,10 @@
+Package: mastershaper
+Version: 0.44
+Section: contrib/net
+Priority: optional
+Architecture: all
+Pre-depends: debconf, dbconfig-common
+Depends: mysql-server, php-net-ipv4, php-db, php5-gd, libphp-phplayersmenu
+Maintainer: Inveneo Support <support@inveneo.org>
+Description:  network traffic shaper with web UI for QoS functions of newer kernels
+ Network Traffic Under Control (www.mastershaper.org).

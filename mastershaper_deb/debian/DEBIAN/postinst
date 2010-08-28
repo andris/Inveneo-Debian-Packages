@@ -1,0 +1,80 @@
+#!/bin/sh
+
+#stop if we hit errors
+set -e
+
+# Include debconf and dbconfig-common for configuration
+# source debconf stuff
+. /usr/share/debconf/confmodule
+# source dbconfig-common stuff
+. /usr/share/dbconfig-common/dpkg/postinst.mysql
+dbc_go mastershaper $@
+
+#LINK IN JPGRAPH (DOUBLE CHECK IF SYNTAX)
+#if [ -d /var/www/mastershaper -a -d /usr/share/jpgraph/ -a ! -e /var/www/mastershaper/jpgraph ]; then
+#  ln -sf /usr/share/jpgraph/ /var/www/mastershaper/jpgraph
+#fi
+
+#LINK IN PHPLAYERSMENU (DOUBLE CHECK IF SYNTAX)
+if [ -d /var/www/mastershaper -a -d /usr/share/php/libphp-phplayersmenu/ -a ! -e /var/www/mastershaper/phplayersmenu ]; then
+  ln -sf /usr/share/php/libphp-phplayersmenu/ /var/www/mastershaper/phplayersmenu
+fi
+
+#ACTIVATE INIT SCRIPT
+if [ -f /etc/init.d/mastershaper ]; then
+  update-rc.d mastershaper defaults
+fi
+
+#CHOWN TO WWW-DATA
+if id www-data > /dev/null 2>&1; then
+  if egrep -i "www-data" /etc/group > /dev/null 2>&1; then
+    chown -R www-data:www-data /var/www/mastershaper
+  fi
+fi
+
+
+#Check if they want inveneo config or if they want to customize
+db_get mastershaper/use_inveneo_config
+
+if [ "$RET" = "false" ]
+then
+  #looks like they don't want the inveneo config
+  if [ -f /var/www/mastershaper/config.dat ]; then
+    rm -f /var/www/mastershaper/config.dat
+  fi
+else
+  #put the mysqldb password directly into the shaper config
+  if [ -f /var/www/mastershaper/config.dat ]; then
+    DB_PASSWORD=$dbc_dbpass
+    sed -i "s/#@INSERT_PASSWORD_HERE@#/$DB_PASSWORD/g" /var/www/mastershaper/config.dat
+  fi
+fi
+
+
+db_get mastershaper/configure_sudoers
+
+if [ "$RET" = "true" ]; then
+  #ADD ENTRY IN SUDOERS
+  SUDOERS_FILE=/etc/sudoers
+
+  if ! egrep -i "#BEGIN MASTERSHAPER RULE" $SUDOERS_FILE > /dev/null 2>&1; then
+    if ! egrep -i "#END MASTERSHAPER RULE" $SUDOERS_FILE > /dev/null 2>&1; then
+      echo "#BEGIN MASTERSHAPER RULE" >> $SUDOERS_FILE
+      echo "#Allow mastershaper to load its rules from the web UI without a password" >> $SUDOERS_FILE
+      echo "www-data      ALL= NOPASSWD: /var/www/mastershaper/shaper_loader.sh" >> $SUDOERS_FILE
+      echo "#END MASTERSHAPER RULE" >> $SUDOERS_FILE
+    fi
+  fi
+fi
+
+echo
+echo
+echo "*********************"
+echo "MASTERSHAPER"
+echo "INSTALLATION COMPLETE"
+echo "*********************"
+echo "Navigate to http://localhost/mastershaper to configure and start shaping."
+echo "Note that if the same server is both shaping and performing NAT"
+echo "shaping may not operate as expected and IMQ may be required."
+echo "IMQ must be installad manually"
+echo

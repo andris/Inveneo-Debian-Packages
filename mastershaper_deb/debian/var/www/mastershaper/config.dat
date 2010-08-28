@@ -1,0 +1,32 @@
+##### MasterShaper Config, created on 2010-08-27 17:52 ####
+
+##### MYSQL HOST #####
+MYSQL_HOST="localhost"
+
+##### MYSQL_USER #####
+MYSQL_USER="mastershaper"
+
+##### MYSQL_PASS #####
+MYSQL_PASS="#@INSERT_PASSWORD_HERE@#"
+
+##### MYSQL_DB   #####
+MYSQL_DB="mastershaper"
+
+##### SHAPER PATH ####
+SHAPER_PATH="/var/www/mastershaper"
+
+##### SHAPER WEB #####
+SHAPER_WEB="/mastershaper"
+
+##### TC BIN #########
+TC_BIN="/sbin/tc"
+
+##### IPT BIN ########
+IPT_BIN="/sbin/iptables"
+
+##### SUDO BIN #######
+SUDO_BIN="/usr/bin/sudo"
+
+##### TEMP PATH ######
+TEMP_PATH="/tmp"
+

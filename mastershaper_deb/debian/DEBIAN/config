@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# stop if we hit an error
+set -e
+
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+#Ask the user if they want us to configure /etc/sudoers for them
+db_input medium mastershaper/configure_sudoers || true
+db_go
+
+#Ask the user if they want the Inveneo config, or to configure on their own
+db_input high mastershaper/use_inveneo_config || true
+db_go
+
+# we only do mysql
+dbc_dbtypes="mysql"
+# source dbconfig-common stuff
+. /usr/share/dbconfig-common/dpkg/config 
+dbc_go mastershaper $@

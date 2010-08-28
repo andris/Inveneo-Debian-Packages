@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# stop if we hit an error
+set -e
+
+# Include debconf and dbconfig-common for configuration
+# source debconf stuff
+. /usr/share/debconf/confmodule
+# source dbconfig-common stuff
+. /usr/share/dbconfig-common/dpkg/postrm.mysql
+dbc_go mastershaper $@
+
+# stop mastershaper from autostarting
+if [ -f /etc/init.d/mastershaper ]; then
+  update-rc.d -f mastershaper remove
+fi
+
+# UNLINK PHPLAYERSMENU
+if [ -h /var/www/mastershaper/phplayersmenu ]; then
+  rm -f /var/www/mastershaper/phplayersmenu
+fi
+
+# UNLINK JPGRAPH
+#if [ -h /var/www/mastershaper/jpgraph ]; then
+#  rm -f /var/www/mastershaper/jpgraph
+#fi
+
+#if [ -d /var/www/mastershaper ]; then
+#  rmdir /var/www/mastershaper
+#fi
+
+# REMOVE LINE IN SUDOERS
+SUDOERS_FILE=/etc/sudoers
+
+if egrep -i "#BEGIN MASTERSHAPER RULE" $SUDOERS_FILE > /dev/null 2>&1; then
+  if egrep -i "#END MASTERSHAPER RULE" $SUDOERS_FILE > /dev/null 2>&1; then
+    TMPFILE=`mktemp /tmp/mastershaper_dpkg.XXXXXXXXXX` || exit 1
+    chmod 0440 $TMPFILE
+    sed '/#BEGIN MASTERSHAPER RULE/,/END MASTERSHAPER RULE/d' $SUDOERS_FILE > $TMPFILE
+    mv $TMPFILE $SUDOERS_FILE
+  fi
+fi
+
+#purge debconf
+if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
+    # Source debconf library.
+    . /usr/share/debconf/confmodule
+    # Remove my changes to the db.
+    db_purge
+fi

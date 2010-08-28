@@ -1,0 +1,7 @@
+To build the package:
+
+1) fakeroot dpkg-deb --build debian
+2) mv debian.deb mastershaper_0.44_all.deb
+3) lintian mastershaper_0.44_all.deb
+
+DONE!
